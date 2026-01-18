@@ -8,14 +8,14 @@ export default async function HomePage() {
   const products = await getAvailableProducts();
 
   return (
-    <div className="min-h-screen bg-warm-white">
+    <div className="min-h-screen bg-amber-50/30">
       {/* Header */}
-      <header className="bg-gradient-to-r from-warm-amber-50 to-warm-beige border-b border-warm-beige">
+      <header className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border-b border-amber-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-warm-black mb-3">
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-stone-900 mb-3">
             Keramik från hjärtat
           </h1>
-          <p className="text-warm-gray text-lg max-w-2xl mx-auto">
+          <p className="text-stone-700 text-lg max-w-2xl mx-auto">
             Varje pjäs är handgjord och unik
           </p>
         </div>
@@ -25,7 +25,7 @@ export default async function HomePage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {products.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-warm-gray text-lg">
+            <p className="text-stone-600 text-lg">
               Galleriet vilar just nu. Nya verk läggs upp allt eftersom ugnen öppnas
             </p>
           </div>
@@ -37,9 +37,9 @@ export default async function HomePage() {
                 href={`/product/${product.id}`}
                 className="group"
               >
-                <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2">
+                <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2 duration-300">
                   {/* Product Image */}
-                  <div className="aspect-square relative bg-gradient-to-br from-warm-beige to-warm-white">
+                  <div className="aspect-square relative bg-gradient-to-br from-amber-50 to-orange-50">
                     {product.image ? (
                       <Image
                         src={product.image}
@@ -49,7 +49,7 @@ export default async function HomePage() {
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-warm-gray">
+                      <div className="w-full h-full flex items-center justify-center text-stone-400">
                         Ingen bild
                       </div>
                     )}
@@ -57,17 +57,17 @@ export default async function HomePage() {
 
                   {/* Product Info */}
                   <div className="p-6">
-                    <h2 className="text-xl font-serif font-semibold text-warm-black mb-2 group-hover:text-warm-gray">
+                    <h2 className="text-xl font-serif font-semibold text-stone-900 mb-2 group-hover:text-amber-900 transition-colors">
                       {product.name}
                     </h2>
-                    <p className="text-warm-gray text-sm mb-4 line-clamp-2">
+                    <p className="text-stone-600 text-sm mb-4 line-clamp-2">
                       {product.description}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-warm-black">
+                      <span className="text-2xl font-bold text-stone-900">
                         {product.price} kr
                       </span>
-                      <span className="text-sm text-warm-gray uppercase tracking-wide">
+                      <span className="text-sm text-stone-500 uppercase tracking-wide">
                         {product.category}
                       </span>
                     </div>
@@ -80,9 +80,9 @@ export default async function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-warm-beige mt-16">
+      <footer className="bg-white border-t border-amber-100 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-center text-warm-gray text-sm">
+          <p className="text-center text-stone-600 text-sm">
             Alla produkter är handgjorda och unika
           </p>
         </div>
