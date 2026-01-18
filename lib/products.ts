@@ -1,8 +1,9 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { kv } from '@vercel/kv';
 import { Product, ProductInput } from './types';
 
-const PRODUCTS_FILE = path.join(process.cwd(), 'data', 'products.json');
+// Keys structure:
+// - product:{id} -> Product object
+// - products:ids -> Set of all product IDs
 
 // Generate unique reference code (format: KER-XXXX)
 function generateReferenceCode(): string {
@@ -17,18 +18,29 @@ function generateReferenceCode(): string {
 // Read all products
 export async function getProducts(): Promise<Product[]> {
   try {
-    const data = await fs.readFile(PRODUCTS_FILE, 'utf-8');
-    return JSON.parse(data);
+    const ids = await kv.smembers('products:ids') as string[] || [];
+    if (ids.length === 0) return [];
+
+    const products = await Promise.all(
+      ids.map(id => kv.get<Product>(`product:${id}`))
+    );
+
+    return products.filter(Boolean) as Product[];
   } catch (error) {
-    // If file doesn't exist or is empty, return empty array
+    console.error('Error fetching products:', error);
     return [];
   }
 }
 
 // Get single product by ID
 export async function getProductById(id: string): Promise<Product | null> {
-  const products = await getProducts();
-  return products.find(p => p.id === id) || null;
+  try {
+    const product = await kv.get<Product>(`product:${id}`);
+    return product || null;
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return null;
+  }
 }
 
 // Get available products (not sold)
@@ -37,65 +49,58 @@ export async function getAvailableProducts(): Promise<Product[]> {
   return products.filter(p => p.status === 'available');
 }
 
-// Save products to file
-async function saveProducts(products: Product[]): Promise<void> {
-  await fs.writeFile(PRODUCTS_FILE, JSON.stringify(products, null, 2), 'utf-8');
-}
-
 // Create new product
 export async function createProduct(input: ProductInput): Promise<Product> {
-  const products = await getProducts();
-
-  const newProduct: Product = {
-    id: Date.now().toString(),
+  const id = Date.now().toString();
+  const product: Product = {
+    id,
     ...input,
     status: 'available',
     createdAt: new Date().toISOString(),
     referenceCode: generateReferenceCode(),
   };
 
-  products.push(newProduct);
-  await saveProducts(products);
+  await kv.set(`product:${id}`, product);
+  await kv.sadd('products:ids', id);
 
-  return newProduct;
+  return product;
 }
 
 // Update product
 export async function updateProduct(id: string, updates: Partial<ProductInput>): Promise<Product | null> {
-  const products = await getProducts();
-  const index = products.findIndex(p => p.id === id);
+  const product = await getProductById(id);
 
-  if (index === -1) return null;
+  if (!product) return null;
 
-  products[index] = {
-    ...products[index],
+  const updatedProduct: Product = {
+    ...product,
     ...updates,
   };
 
-  await saveProducts(products);
-  return products[index];
+  await kv.set(`product:${id}`, updatedProduct);
+  return updatedProduct;
 }
 
 // Delete product
 export async function deleteProduct(id: string): Promise<boolean> {
-  const products = await getProducts();
-  const filtered = products.filter(p => p.id !== id);
+  const product = await getProductById(id);
 
-  if (filtered.length === products.length) return false;
+  if (!product) return false;
 
-  await saveProducts(filtered);
+  await kv.del(`product:${id}`);
+  await kv.srem('products:ids', id);
+
   return true;
 }
 
 // Mark product as sold
 export async function markAsSold(id: string): Promise<Product | null> {
-  const products = await getProducts();
-  const index = products.findIndex(p => p.id === id);
+  const product = await getProductById(id);
 
-  if (index === -1) return null;
+  if (!product) return null;
 
-  products[index].status = 'sold';
-  await saveProducts(products);
+  product.status = 'sold';
+  await kv.set(`product:${id}`, product);
 
-  return products[index];
+  return product;
 }

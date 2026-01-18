@@ -4,8 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createProduct, updateProduct, deleteProduct } from '@/lib/products';
 import { ProductInput } from '@/lib/types';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { put } from '@vercel/blob';
 
 export async function createProductAction(formData: FormData) {
   try {
@@ -19,24 +18,11 @@ export async function createProductAction(formData: FormData) {
 
     // Handle image upload
     if (imageFile && imageFile.size > 0) {
-      const bytes = await imageFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+      const blob = await put(imageFile.name, imageFile, {
+        access: 'public',
+      });
 
-      // Create unique filename
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-      const ext = path.extname(imageFile.name);
-      const filename = `${uniqueSuffix}${ext}`;
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-      const filepath = path.join(uploadsDir, filename);
-
-      // Ensure uploads directory exists
-      await mkdir(uploadsDir, { recursive: true });
-
-      // Save file
-      await writeFile(filepath, buffer);
-
-      // Store path relative to public directory
-      imagePath = `/uploads/${filename}`;
+      imagePath = blob.url;
     }
 
     const productInput: ProductInput = {
@@ -71,19 +57,11 @@ export async function updateProductAction(id: string, formData: FormData) {
 
     // Handle image upload
     if (imageFile && imageFile.size > 0) {
-      const bytes = await imageFile.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+      const blob = await put(imageFile.name, imageFile, {
+        access: 'public',
+      });
 
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-      const ext = path.extname(imageFile.name);
-      const filename = `${uniqueSuffix}${ext}`;
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-      const filepath = path.join(uploadsDir, filename);
-
-      await mkdir(uploadsDir, { recursive: true });
-      await writeFile(filepath, buffer);
-
-      imagePath = `/uploads/${filename}`;
+      imagePath = blob.url;
     } else if (keepExistingImage) {
       // Keep existing image - don't update image field
       imagePath = undefined;

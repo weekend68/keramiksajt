@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/fltman/agent-factory#readme",
   "dependencies": {
+    "@vercel/blob": "^2.0.0",
+    "@vercel/kv": "^3.0.0",
     "next": "^16.1.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
