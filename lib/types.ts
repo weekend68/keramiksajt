@@ -3,7 +3,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  image: string; // path to image
+  images: string[]; // up to 3 images
   category: string;
   status: 'available' | 'reserved' | 'sold';
   createdAt: string;
@@ -17,6 +17,10 @@ export interface ProductInput {
   name: string;
   description: string;
   price: number;
-  image: string;
+  images: string[];
   category: string;
 }
+
+// Available categories
+export const PRODUCT_CATEGORIES = ['Skål', 'Vas', 'Kopp', 'Övrigt'] as const;
+export type ProductCategory = typeof PRODUCT_CATEGORIES[number];

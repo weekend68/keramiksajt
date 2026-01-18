@@ -12,39 +12,42 @@ export async function createProductAction(formData: FormData) {
     const description = formData.get('description') as string;
     const price = parseFloat(formData.get('price') as string);
     const category = formData.get('category') as string;
-    const imageFile = formData.get('image') as File | null;
 
-    let imagePath = '';
+    // Handle multiple image uploads (up to 3)
+    const imagePaths: string[] = [];
 
-    // Handle image upload to Supabase Storage
-    if (imageFile && imageFile.size > 0) {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `products/${fileName}`;
+    for (let i = 0; i < 3; i++) {
+      const imageFile = formData.get(`image${i}`) as File | null;
 
-      // Convert File to ArrayBuffer
-      const arrayBuffer = await imageFile.arrayBuffer();
-      const buffer = new Uint8Array(arrayBuffer);
+      if (imageFile && imageFile.size > 0) {
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${Date.now()}_${i}.${fileExt}`;
+        const filePath = `products/${fileName}`;
 
-      // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, buffer, {
-          contentType: imageFile.type,
-          upsert: false,
-        });
+        // Convert File to ArrayBuffer
+        const arrayBuffer = await imageFile.arrayBuffer();
+        const buffer = new Uint8Array(arrayBuffer);
 
-      if (error) {
-        console.error('Error uploading image:', error);
-        throw error;
+        // Upload to Supabase Storage
+        const { data, error } = await supabase.storage
+          .from('product-images')
+          .upload(filePath, buffer, {
+            contentType: imageFile.type,
+            upsert: false,
+          });
+
+        if (error) {
+          console.error('Error uploading image:', error);
+          throw error;
+        }
+
+        // Get public URL
+        const { data: publicUrlData } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(filePath);
+
+        imagePaths.push(publicUrlData.publicUrl);
       }
-
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      imagePath = publicUrlData.publicUrl;
     }
 
     const productInput: ProductInput = {
@@ -52,7 +55,7 @@ export async function createProductAction(formData: FormData) {
       description,
       price,
       category,
-      image: imagePath,
+      images: imagePaths,
     };
 
     await createProduct(productInput);

@@ -30,7 +30,7 @@ export async function getProducts(): Promise<Product[]> {
       name: item.name,
       description: item.description,
       price: parseFloat(item.price),
-      image: item.image,
+      images: item.images ? JSON.parse(item.images) : [],
       category: item.category,
       status: item.status as 'available' | 'reserved' | 'sold',
       createdAt: item.created_at,
@@ -65,7 +65,7 @@ export async function getProductById(id: string): Promise<Product | null> {
       name: data.name,
       description: data.description,
       price: parseFloat(data.price),
-      image: data.image,
+      images: data.images ? JSON.parse(data.images) : [],
       category: data.category,
       status: data.status as 'available' | 'reserved' | 'sold',
       createdAt: data.created_at,
@@ -100,7 +100,7 @@ export async function getAvailableProducts(): Promise<Product[]> {
       name: item.name,
       description: item.description,
       price: parseFloat(item.price),
-      image: item.image,
+      images: item.images ? JSON.parse(item.images) : [],
       category: item.category,
       status: item.status as 'available' | 'reserved' | 'sold',
       createdAt: item.created_at,
@@ -125,7 +125,7 @@ export async function createProduct(input: ProductInput): Promise<Product> {
     name: input.name,
     description: input.description,
     price: input.price,
-    image: input.image,
+    images: JSON.stringify(input.images),
     category: input.category,
     status: 'available',
     created_at: now,
@@ -149,7 +149,7 @@ export async function createProduct(input: ProductInput): Promise<Product> {
     name: data.name,
     description: data.description,
     price: parseFloat(data.price),
-    image: data.image,
+    images: data.images ? JSON.parse(data.images) : [],
     category: data.category,
     status: data.status as 'available' | 'reserved' | 'sold',
     createdAt: data.created_at,
@@ -163,9 +163,14 @@ export async function createProduct(input: ProductInput): Promise<Product> {
 // Update product
 export async function updateProduct(id: string, updates: Partial<ProductInput>): Promise<Product | null> {
   try {
+    // Convert images array to JSON string if present
+    const dbUpdates = updates.images
+      ? { ...updates, images: JSON.stringify(updates.images) }
+      : updates;
+
     const { data, error } = await supabase
       .from('products')
-      .update(updates)
+      .update(dbUpdates)
       .eq('id', id)
       .select()
       .single();
@@ -181,7 +186,7 @@ export async function updateProduct(id: string, updates: Partial<ProductInput>):
       name: data.name,
       description: data.description,
       price: parseFloat(data.price),
-      image: data.image,
+      images: data.images ? JSON.parse(data.images) : [],
       category: data.category,
       status: data.status as 'available' | 'reserved' | 'sold',
       createdAt: data.created_at,
@@ -243,7 +248,7 @@ export async function markAsSold(id: string): Promise<Product | null> {
       name: data.name,
       description: data.description,
       price: parseFloat(data.price),
-      image: data.image,
+      images: data.images ? JSON.parse(data.images) : [],
       category: data.category,
       status: data.status as 'available' | 'reserved' | 'sold',
       createdAt: data.created_at,
@@ -291,7 +296,7 @@ export async function reserveProduct(
       name: data.name,
       description: data.description,
       price: parseFloat(data.price),
-      image: data.image,
+      images: data.images ? JSON.parse(data.images) : [],
       category: data.category,
       status: data.status as 'available' | 'reserved' | 'sold',
       createdAt: data.created_at,
@@ -332,7 +337,7 @@ export async function unreserveProduct(id: string): Promise<Product | null> {
       name: data.name,
       description: data.description,
       price: parseFloat(data.price),
-      image: data.image,
+      images: data.images ? JSON.parse(data.images) : [],
       category: data.category,
       status: data.status as 'available' | 'reserved' | 'sold',
       createdAt: data.created_at,

@@ -2,21 +2,24 @@
 
 import { useState } from 'react';
 import { createProductAction } from '../actions';
+import { PRODUCT_CATEGORIES } from '@/lib/types';
 
 export default function ProductForm() {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        setImagePreviews(prev => {
+          const newPreviews = [...prev];
+          newPreviews[index] = reader.result as string;
+          return newPreviews;
+        });
       };
       reader.readAsDataURL(file);
-    } else {
-      setImagePreview(null);
     }
   };
 
@@ -97,37 +100,43 @@ export default function ProductForm() {
           className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent"
         >
           <option value="">Välj kategori</option>
-          <option value="tallrik">Tallrik</option>
-          <option value="skål">Skål</option>
-          <option value="fat">Fat</option>
-          <option value="lampfot">Lampfot</option>
-          <option value="annat">Annat</option>
+          {PRODUCT_CATEGORIES.map(cat => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
         </select>
       </div>
 
-      {/* Image Upload */}
-      <div>
-        <label htmlFor="image" className="block text-sm font-medium text-stone-700 mb-1">
-          Bild *
+      {/* Image Upload - Up to 3 images */}
+      <div className="space-y-4">
+        <label className="block text-sm font-medium text-stone-700 mb-2">
+          Bilder (upp till 3) *
         </label>
-        <input
-          type="file"
-          id="image"
-          name="image"
-          accept="image/*"
-          required
-          onChange={handleImageChange}
-          className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent"
-        />
-        {imagePreview && (
-          <div className="mt-4">
-            <img
-              src={imagePreview}
-              alt="Förhandsgranskning"
-              className="w-full h-48 object-cover rounded-lg"
+
+        {[0, 1, 2].map(index => (
+          <div key={index}>
+            <label htmlFor={`image${index}`} className="block text-xs text-stone-600 mb-1">
+              Bild {index + 1} {index === 0 && '(obligatorisk)'}
+            </label>
+            <input
+              type="file"
+              id={`image${index}`}
+              name={`image${index}`}
+              accept="image/*"
+              required={index === 0}
+              onChange={(e) => handleImageChange(e, index)}
+              className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
             />
+            {imagePreviews[index] && (
+              <div className="mt-2">
+                <img
+                  src={imagePreviews[index]}
+                  alt={`Förhandsgranskning ${index + 1}`}
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+              </div>
+            )}
           </div>
-        )}
+        ))}
       </div>
 
       {/* Submit Button */}

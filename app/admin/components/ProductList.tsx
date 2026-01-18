@@ -77,9 +77,9 @@ export default function ProductList({ products }: ProductListProps) {
             <div className="flex gap-4">
               {/* Product Image */}
               <div className="w-20 h-20 relative bg-stone-100 rounded flex-shrink-0">
-                {product.image ? (
+                {product.images && product.images.length > 0 ? (
                   <Image
-                    src={product.image}
+                    src={product.images[0]}
                     alt={product.name}
                     fill
                     className="object-cover rounded"

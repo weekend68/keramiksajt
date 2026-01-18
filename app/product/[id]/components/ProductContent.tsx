@@ -22,19 +22,25 @@ export default function ProductContent({ product, swishNumber }: ProductContentP
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-0">
-      {/* Product Image - 60% on desktop */}
-      <div className="md:col-span-3 aspect-square md:aspect-auto relative bg-amber-50">
-        {product.image ? (
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-cover"
-            priority
-            sizes="(max-width: 768px) 100vw, 60vw"
-          />
+      {/* Product Images Gallery - 60% on desktop */}
+      <div className="md:col-span-3 bg-amber-50">
+        {product.images && product.images.length > 0 ? (
+          <div className="space-y-2">
+            {product.images.map((image, index) => (
+              <div key={index} className="aspect-square relative bg-amber-50">
+                <Image
+                  src={image}
+                  alt={`${product.name} - Bild ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                  sizes="(max-width: 768px) 100vw, 60vw"
+                />
+              </div>
+            ))}
+          </div>
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-stone-600">
+          <div className="aspect-square flex items-center justify-center text-stone-600">
             Ingen bild
           </div>
         )}

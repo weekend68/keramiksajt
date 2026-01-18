@@ -44,9 +44,9 @@ export default async function HomePage() {
                 <div className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2 duration-300">
                   {/* Product Image */}
                   <div className="aspect-square relative bg-gradient-to-br from-amber-50 to-orange-50">
-                    {product.image ? (
+                    {product.images && product.images.length > 0 ? (
                       <Image
-                        src={product.image}
+                        src={product.images[0]}
                         alt={product.name}
                         fill
                         className="object-cover"
