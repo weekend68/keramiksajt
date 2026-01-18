@@ -11,19 +11,21 @@ interface EditProductModalProps {
 }
 
 export default function EditProductModal({ product, onClose }: EditProductModalProps) {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+        setImagePreviews(prev => {
+          const newPreviews = [...prev];
+          newPreviews[index] = reader.result as string;
+          return newPreviews;
+        });
       };
       reader.readAsDataURL(file);
-    } else {
-      setImagePreview(null);
     }
   };
 
@@ -127,7 +129,7 @@ export default function EditProductModal({ product, onClose }: EditProductModalP
             </div>
 
             {/* Current Images */}
-            {product.images && product.images.length > 0 && !imagePreview && (
+            {product.images && product.images.length > 0 && imagePreviews.length === 0 && (
               <div>
                 <label className="block text-sm font-medium text-stone-700 mb-1">
                   Nuvarande bilder ({product.images.length})
@@ -152,28 +154,36 @@ export default function EditProductModal({ product, onClose }: EditProductModalP
               </div>
             )}
 
-            {/* Image Upload */}
-            <div>
-              <label htmlFor="edit-image" className="block text-sm font-medium text-stone-700 mb-1">
-                {product.image ? 'Byt bild (valfritt)' : 'Bild'}
+            {/* Image Upload - Up to 3 images */}
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-stone-700 mb-2">
+                {product.images && product.images.length > 0 ? 'Byt bilder (valfritt)' : 'Bilder (upp till 3)'}
               </label>
-              <input
-                type="file"
-                id="edit-image"
-                name="image"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent"
-              />
-              {imagePreview && (
-                <div className="mt-4">
-                  <img
-                    src={imagePreview}
-                    alt="Ny förhandsgranskning"
-                    className="w-full h-48 object-cover rounded-lg"
+
+              {[0, 1, 2].map(index => (
+                <div key={index}>
+                  <label htmlFor={`edit-image${index}`} className="block text-xs text-stone-600 mb-1">
+                    Bild {index + 1}
+                  </label>
+                  <input
+                    type="file"
+                    id={`edit-image${index}`}
+                    name={`image${index}`}
+                    accept="image/*"
+                    onChange={(e) => handleImageChange(e, index)}
+                    className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent text-sm"
                   />
+                  {imagePreviews[index] && (
+                    <div className="mt-2">
+                      <img
+                        src={imagePreviews[index]}
+                        alt={`Förhandsgranskning ${index + 1}`}
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
+              ))}
             </div>
 
             {/* Submit Buttons */}
