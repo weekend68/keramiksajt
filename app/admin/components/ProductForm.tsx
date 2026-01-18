@@ -24,7 +24,12 @@ export default function ProductForm() {
     setIsSubmitting(true);
     try {
       await createProductAction(formData);
-    } catch (error) {
+    } catch (error: any) {
+      // Next.js redirect() throws NEXT_REDIRECT which is normal behavior
+      if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+        // This is expected, redirect is happening
+        return;
+      }
       console.error('Error creating product:', error);
       alert('Fel vid skapande av produkt');
       setIsSubmitting(false);

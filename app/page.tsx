@@ -10,10 +10,10 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Header */}
-      <header className="bg-white border-b border-stone-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-stone-900">Keramik Galleri</h1>
-          <p className="text-stone-600 mt-1">Handgjord keramik - unika verk</p>
+      <header className="bg-gradient-to-r from-amber-50 to-stone-50 border-b border-stone-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-2">Keramik Galleri</h1>
+          <p className="text-stone-600 text-lg">Handgjord keramik - unika verk i stengods</p>
         </div>
       </header>
 
@@ -36,9 +36,9 @@ export default async function HomePage() {
                 href={`/product/${product.id}`}
                 className="group"
               >
-                <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all hover:-translate-y-1">
                   {/* Product Image */}
-                  <div className="aspect-square relative bg-stone-100">
+                  <div className="aspect-square relative bg-gradient-to-br from-stone-100 to-stone-50">
                     {product.image ? (
                       <Image
                         src={product.image}
