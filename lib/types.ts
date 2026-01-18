@@ -22,5 +22,13 @@ export interface ProductInput {
 }
 
 // Available categories
-export const PRODUCT_CATEGORIES = ['Skål', 'Vas', 'Kopp', 'Övrigt'] as const;
+export const PRODUCT_CATEGORIES = [
+  'Tallrik',
+  'Skål',
+  'Fat',
+  'Lampfot',
+  'Vas',
+  'Kopp',
+  'Annat'
+] as const;
 export type ProductCategory = typeof PRODUCT_CATEGORIES[number];

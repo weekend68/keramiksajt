@@ -37,7 +37,12 @@ export default function EditProductModal({ product, onClose }: EditProductModalP
       const formData = new FormData(e.currentTarget);
       await updateProductAction(product.id, formData);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
+      // Next.js redirect() throws NEXT_REDIRECT which is normal behavior
+      if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+        // This is expected, redirect is happening
+        return;
+      }
       console.error('Error updating product:', error);
       alert('Fel vid uppdatering av produkt');
       setIsSubmitting(false);
@@ -121,10 +126,13 @@ export default function EditProductModal({ product, onClose }: EditProductModalP
                 className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent"
               >
                 <option value="">Välj kategori</option>
+                <option value="Tallrik">Tallrik</option>
                 <option value="Skål">Skål</option>
+                <option value="Fat">Fat</option>
+                <option value="Lampfot">Lampfot</option>
                 <option value="Vas">Vas</option>
                 <option value="Kopp">Kopp</option>
-                <option value="Övrigt">Övrigt</option>
+                <option value="Annat">Annat</option>
               </select>
             </div>
 
