@@ -15,8 +15,12 @@ export default async function HomePage() {
           <h1 className="text-4xl md:text-5xl font-serif font-bold text-stone-900 mb-4">
             Keramik från hjärtat
           </h1>
-          <p className="text-stone-700 text-lg max-w-2xl mx-auto leading-relaxed">
-            Handgjorda keramikverk från min verkstad. Varje pjäs är unik och skapad med omtanke.
+          <p className="text-stone-700 text-lg max-w-2xl mx-auto leading-relaxed mb-3">
+            Handgjorda keramikverk från min ateljé i Hantverksföreningen Knut, Bagarmossen.
+            Varje pjäs är unik, drejad och glaserad med omsorg.
+          </p>
+          <p className="text-stone-600 text-sm italic max-w-xl mx-auto">
+            The future is handmade
           </p>
         </div>
       </header>
@@ -81,14 +85,32 @@ export default async function HomePage() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-amber-100 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center space-y-2">
-            <p className="text-stone-600 text-sm">
-              Alla produkter är handgjorda och unika
-            </p>
-            <p className="text-stone-500 text-sm">
-              Frågor? Kontakta mig på <a href="mailto:hej@keramik.se" className="text-amber-700 hover:text-amber-900 underline">hej@keramik.se</a>
-            </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="max-w-3xl mx-auto space-y-6">
+            {/* Main info */}
+            <div className="text-center space-y-2">
+              <p className="text-stone-600 text-sm">
+                Alla produkter är handgjorda och unika
+              </p>
+              <p className="text-stone-500 text-sm">
+                Frågor? Kontakta mig på <a href="mailto:hej@keramik.se" className="text-amber-700 hover:text-amber-900 underline">hej@keramik.se</a>
+              </p>
+            </div>
+
+            {/* About the workshop */}
+            <div className="border-t border-amber-100 pt-6">
+              <h3 className="text-center text-stone-900 font-serif font-semibold mb-3">
+                Om verkstaden
+              </h3>
+              <p className="text-stone-600 text-sm text-center leading-relaxed max-w-2xl mx-auto">
+                Jag arbetar i Hantverksföreningen Knut i Bagarmossen – en levande ateljé med keramik och textilt hantverk
+                som funnits i över 30 år. Här har jag tillgång till drejskivor, ugnar och allt som behövs för att skapa
+                unika keramikverk. Varje pjäs är formad för hand och bränd i 1240°C.
+              </p>
+              <p className="text-stone-500 text-xs text-center mt-3 italic">
+                Hantverksföreningen Knut • Bergsrådsvägen 88, Bagarmossen
+              </p>
+            </div>
           </div>
         </div>
       </footer>

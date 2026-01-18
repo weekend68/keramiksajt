@@ -44,31 +44,40 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <h2 className="text-2xl font-serif font-bold text-stone-900 mb-4">
               Om hantverket
             </h2>
+            <p className="text-stone-600 leading-relaxed mb-4">
+              Denna pjäs är skapad i min ateljé på Hantverksföreningen Knut i Bagarmossen.
+              Där har jag tillgång till drejskivor, ugnar och ett kreativt sammanhang med andra hantverkare
+              som arbetar med keramik och textil. Föreningen har funnits i över 30 år och är en levande
+              mötesplats för hantverk.
+            </p>
             <p className="text-stone-600 leading-relaxed">
-              Varje pjäs är unik och formad för hand i stengods. Bränd i 1240°C
-              vilket ger styrka och hållbarhet för daglig användning. Små variationer
-              i form, färg och glasyr är en del av hantverkets charm och gör varje
-              produkt helt unik.
+              Varje pjäs är formad för hand i stengods och bränd i 1240°C, vilket ger styrka och hållbarhet
+              för daglig användning. Små variationer i form, färg och glasyr är en del av hantverkets charm
+              och gör varje produkt helt unik.
             </p>
           </div>
 
-          {/* Varför köpa handgjort */}
+          {/* The future is handmade */}
           <div className="bg-white rounded-2xl shadow-md p-8">
             <h2 className="text-2xl font-serif font-bold text-stone-900 mb-4">
-              Varför köpa handgjort?
+              The future is handmade
             </h2>
             <ul className="space-y-3 text-stone-600">
               <li className="flex items-start gap-3">
                 <span className="text-amber-600 font-bold flex-shrink-0">✓</span>
-                <span><strong>Unika</strong> - Ingen produkt är identisk, varje pjäs har sin egen karaktär</span>
+                <span><strong>Unikt</strong> - Ingen produkt är identisk, varje pjäs har sin egen karaktär</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-amber-600 font-bold flex-shrink-0">✓</span>
-                <span><strong>Hållbart</strong> - Håller i generationer med rätt omvårdnad</span>
+                <span><strong>Hållbart</strong> - Håller i generationer och är skapat med omtanke för miljön</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-amber-600 font-bold flex-shrink-0">✓</span>
-                <span><strong>Lokalt</strong> - Stödjer lokala hantverkare och traditionellt hantverk</span>
+                <span><strong>Lokalt hantverk</strong> - Stödjer lokala hantverkare och bevarar traditionella tekniker</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-amber-600 font-bold flex-shrink-0">✓</span>
+                <span><strong>Gemenskap</strong> - Del av en 30-årig hantverkstradition i Bagarmossen</span>
               </li>
             </ul>
           </div>
