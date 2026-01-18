@@ -1,7 +1,7 @@
 'use client';
 
 import { Product } from '@/lib/types';
-import { deleteProductAction } from '../actions';
+import { deleteProductAction, markAsSoldAction, unreserveProductAction } from '../actions';
 import Image from 'next/image';
 import { useState } from 'react';
 import EditProductModal from './EditProductModal';
@@ -22,6 +22,40 @@ export default function ProductList({ products }: ProductListProps) {
         alert('Fel vid borttagning av produkt');
       }
     }
+  };
+
+  const handleMarkAsSold = async (id: string, name: string) => {
+    if (confirm(`Markera "${name}" som såld?`)) {
+      try {
+        await markAsSoldAction(id);
+      } catch (error) {
+        console.error('Error marking as sold:', error);
+        alert('Fel vid markering som såld');
+      }
+    }
+  };
+
+  const handleUnreserve = async (id: string, name: string) => {
+    if (confirm(`Frigör reservation för "${name}"?`)) {
+      try {
+        await unreserveProductAction(id);
+      } catch (error) {
+        console.error('Error unreserving product:', error);
+        alert('Fel vid frigörning av reservation');
+      }
+    }
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('sv-SE', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
   };
 
   if (products.length === 0) {
@@ -73,12 +107,14 @@ export default function ProductList({ products }: ProductListProps) {
                     <div className="font-bold text-stone-900">
                       {product.price} kr
                     </div>
-                    <div className={`text-xs px-2 py-1 rounded mt-1 ${
+                    <div className={`text-xs px-2 py-1 rounded mt-1 font-medium ${
                       product.status === 'available'
                         ? 'bg-green-100 text-green-800'
+                        : product.status === 'reserved'
+                        ? 'bg-amber-100 text-amber-800'
                         : 'bg-stone-200 text-stone-800'
                     }`}>
-                      {product.status === 'available' ? 'Tillgänglig' : 'Såld'}
+                      {product.status === 'available' ? 'Tillgänglig' : product.status === 'reserved' ? 'Reserverad' : 'Såld'}
                     </div>
                   </div>
                 </div>
@@ -93,14 +129,61 @@ export default function ProductList({ products }: ProductListProps) {
                   </code>
                 </div>
 
+                {/* Reservation Info */}
+                {product.status === 'reserved' && (
+                  <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs">
+                    <div className="space-y-1">
+                      <div>
+                        <span className="font-medium text-stone-700">Mobil:</span>{' '}
+                        <span className="text-stone-600">{product.reservedBy}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-stone-700">Adress:</span>{' '}
+                        <span className="text-stone-600">{product.deliveryAddress}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-stone-700">Reserverad:</span>{' '}
+                        <span className="text-stone-600">{formatDate(product.reservedAt)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Actions */}
-                <div className="flex gap-2 mt-3">
+                <div className="flex gap-2 mt-3 flex-wrap">
                   <button
                     onClick={() => setEditingProduct(product)}
                     className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                   >
                     Redigera
                   </button>
+
+                  {product.status === 'reserved' && (
+                    <>
+                      <button
+                        onClick={() => handleMarkAsSold(product.id, product.name)}
+                        className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                      >
+                        Markera såld
+                      </button>
+                      <button
+                        onClick={() => handleUnreserve(product.id, product.name)}
+                        className="px-3 py-1 text-sm bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors"
+                      >
+                        Frigör reservation
+                      </button>
+                    </>
+                  )}
+
+                  {product.status === 'available' && (
+                    <button
+                      onClick={() => handleMarkAsSold(product.id, product.name)}
+                      className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                    >
+                      Markera såld
+                    </button>
+                  )}
+
                   <button
                     onClick={() => handleDelete(product.id, product.name)}
                     className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"

@@ -32,9 +32,12 @@ export async function getProducts(): Promise<Product[]> {
       price: parseFloat(item.price),
       image: item.image,
       category: item.category,
-      status: item.status as 'available' | 'sold',
+      status: item.status as 'available' | 'reserved' | 'sold',
       createdAt: item.created_at,
       referenceCode: item.reference_code,
+      reservedBy: item.reserved_by,
+      reservedAt: item.reserved_at,
+      deliveryAddress: item.delivery_address,
     }));
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -64,9 +67,12 @@ export async function getProductById(id: string): Promise<Product | null> {
       price: parseFloat(data.price),
       image: data.image,
       category: data.category,
-      status: data.status as 'available' | 'sold',
+      status: data.status as 'available' | 'reserved' | 'sold',
       createdAt: data.created_at,
       referenceCode: data.reference_code,
+      reservedBy: data.reserved_by,
+      reservedAt: data.reserved_at,
+      deliveryAddress: data.delivery_address,
     };
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -96,9 +102,12 @@ export async function getAvailableProducts(): Promise<Product[]> {
       price: parseFloat(item.price),
       image: item.image,
       category: item.category,
-      status: item.status as 'available' | 'sold',
+      status: item.status as 'available' | 'reserved' | 'sold',
       createdAt: item.created_at,
       referenceCode: item.reference_code,
+      reservedBy: item.reserved_by,
+      reservedAt: item.reserved_at,
+      deliveryAddress: item.delivery_address,
     }));
   } catch (error) {
     console.error('Error fetching available products:', error);
@@ -142,9 +151,12 @@ export async function createProduct(input: ProductInput): Promise<Product> {
     price: parseFloat(data.price),
     image: data.image,
     category: data.category,
-    status: data.status as 'available' | 'sold',
+    status: data.status as 'available' | 'reserved' | 'sold',
     createdAt: data.created_at,
     referenceCode: data.reference_code,
+    reservedBy: data.reserved_by,
+    reservedAt: data.reserved_at,
+    deliveryAddress: data.delivery_address,
   };
 }
 
@@ -171,9 +183,12 @@ export async function updateProduct(id: string, updates: Partial<ProductInput>):
       price: parseFloat(data.price),
       image: data.image,
       category: data.category,
-      status: data.status as 'available' | 'sold',
+      status: data.status as 'available' | 'reserved' | 'sold',
       createdAt: data.created_at,
       referenceCode: data.reference_code,
+      reservedBy: data.reserved_by,
+      reservedAt: data.reserved_at,
+      deliveryAddress: data.delivery_address,
     };
   } catch (error) {
     console.error('Error updating product:', error);
@@ -206,7 +221,13 @@ export async function markAsSold(id: string): Promise<Product | null> {
   try {
     const { data, error } = await supabase
       .from('products')
-      .update({ status: 'sold' })
+      .update({
+        status: 'sold',
+        // Clear reservation fields when marking as sold
+        reserved_by: null,
+        reserved_at: null,
+        delivery_address: null,
+      })
       .eq('id', id)
       .select()
       .single();
@@ -224,12 +245,104 @@ export async function markAsSold(id: string): Promise<Product | null> {
       price: parseFloat(data.price),
       image: data.image,
       category: data.category,
-      status: data.status as 'available' | 'sold',
+      status: data.status as 'available' | 'reserved' | 'sold',
       createdAt: data.created_at,
       referenceCode: data.reference_code,
+      reservedBy: data.reserved_by,
+      reservedAt: data.reserved_at,
+      deliveryAddress: data.delivery_address,
     };
   } catch (error) {
     console.error('Error marking product as sold:', error);
+    return null;
+  }
+}
+
+// Reserve product
+export async function reserveProduct(
+  id: string,
+  mobileNumber: string,
+  address: string
+): Promise<Product | null> {
+  try {
+    const now = new Date().toISOString();
+
+    const { data, error } = await supabase
+      .from('products')
+      .update({
+        status: 'reserved',
+        reserved_by: mobileNumber,
+        reserved_at: now,
+        delivery_address: address,
+      })
+      .eq('id', id)
+      .eq('status', 'available') // Only allow reservation if currently available
+      .select()
+      .single();
+
+    if (error || !data) {
+      console.error('Error reserving product:', error);
+      return null;
+    }
+
+    // Map database fields to Product type (snake_case to camelCase)
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      price: parseFloat(data.price),
+      image: data.image,
+      category: data.category,
+      status: data.status as 'available' | 'reserved' | 'sold',
+      createdAt: data.created_at,
+      referenceCode: data.reference_code,
+      reservedBy: data.reserved_by,
+      reservedAt: data.reserved_at,
+      deliveryAddress: data.delivery_address,
+    };
+  } catch (error) {
+    console.error('Error reserving product:', error);
+    return null;
+  }
+}
+
+// Unreserve product (make available again)
+export async function unreserveProduct(id: string): Promise<Product | null> {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .update({
+        status: 'available',
+        reserved_by: null,
+        reserved_at: null,
+        delivery_address: null,
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error || !data) {
+      console.error('Error unreserving product:', error);
+      return null;
+    }
+
+    // Map database fields to Product type (snake_case to camelCase)
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      price: parseFloat(data.price),
+      image: data.image,
+      category: data.category,
+      status: data.status as 'available' | 'reserved' | 'sold',
+      createdAt: data.created_at,
+      referenceCode: data.reference_code,
+      reservedBy: data.reserved_by,
+      reservedAt: data.reserved_at,
+      deliveryAddress: data.delivery_address,
+    };
+  } catch (error) {
+    console.error('Error unreserving product:', error);
     return null;
   }
 }

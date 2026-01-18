@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { createProduct, updateProduct, deleteProduct } from '@/lib/products';
+import { createProduct, updateProduct, deleteProduct, markAsSold, unreserveProduct } from '@/lib/products';
 import { ProductInput } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
@@ -142,6 +142,30 @@ export async function deleteProductAction(id: string) {
     revalidatePath('/admin');
   } catch (error) {
     console.error('Failed to delete product:', error);
+    throw error;
+  }
+}
+
+export async function markAsSoldAction(id: string) {
+  try {
+    await markAsSold(id);
+    revalidatePath('/');
+    revalidatePath('/admin');
+    revalidatePath(`/product/${id}`);
+  } catch (error) {
+    console.error('Failed to mark product as sold:', error);
+    throw error;
+  }
+}
+
+export async function unreserveProductAction(id: string) {
+  try {
+    await unreserveProduct(id);
+    revalidatePath('/');
+    revalidatePath('/admin');
+    revalidatePath(`/product/${id}`);
+  } catch (error) {
+    console.error('Failed to unreserve product:', error);
     throw error;
   }
 }

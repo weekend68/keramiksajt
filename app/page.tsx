@@ -12,11 +12,11 @@ export default async function HomePage() {
       {/* Header */}
       <header className="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border-b border-amber-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-stone-900 mb-3">
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-stone-900 mb-4">
             Keramik från hjärtat
           </h1>
-          <p className="text-stone-700 text-lg max-w-2xl mx-auto">
-            Varje pjäs är handgjord och unik
+          <p className="text-stone-700 text-lg max-w-2xl mx-auto leading-relaxed">
+            Handgjorda keramikverk från min verkstad. Varje pjäs är unik och skapad med omtanke.
           </p>
         </div>
       </header>
@@ -81,10 +81,15 @@ export default async function HomePage() {
 
       {/* Footer */}
       <footer className="bg-white border-t border-amber-100 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-center text-stone-600 text-sm">
-            Alla produkter är handgjorda och unika
-          </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center space-y-2">
+            <p className="text-stone-600 text-sm">
+              Alla produkter är handgjorda och unika
+            </p>
+            <p className="text-stone-500 text-sm">
+              Frågor? Kontakta mig på <a href="mailto:hej@keramik.se" className="text-amber-700 hover:text-amber-900 underline">hej@keramik.se</a>
+            </p>
+          </div>
         </div>
       </footer>
     </div>

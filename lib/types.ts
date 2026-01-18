@@ -5,9 +5,12 @@ export interface Product {
   price: number;
   image: string; // path to image
   category: string;
-  status: 'available' | 'sold';
+  status: 'available' | 'reserved' | 'sold';
   createdAt: string;
   referenceCode: string; // unique code for Swish payment reference
+  reservedBy?: string; // mobile number
+  reservedAt?: string; // timestamp
+  deliveryAddress?: string; // delivery address
 }
 
 export interface ProductInput {
