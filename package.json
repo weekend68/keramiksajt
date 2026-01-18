@@ -9,17 +9,9 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fltman/agent-factory.git"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/fltman/agent-factory/issues"
-  },
-  "homepage": "https://github.com/fltman/agent-factory#readme",
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
     "@upstash/redis": "^1.36.1",
