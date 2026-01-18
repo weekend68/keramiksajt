@@ -75,44 +75,7 @@ export async function updateProductAction(id: string, formData: FormData) {
     const description = formData.get('description') as string;
     const price = parseFloat(formData.get('price') as string);
     const category = formData.get('category') as string;
-    const imageFile = formData.get('image') as File | null;
-    const keepExistingImage = formData.get('keepExistingImage') as string;
-
-    let imagePath: string | undefined = undefined;
-
-    // Handle image upload to Supabase Storage
-    if (imageFile && imageFile.size > 0) {
-      const fileExt = imageFile.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `products/${fileName}`;
-
-      // Convert File to ArrayBuffer
-      const arrayBuffer = await imageFile.arrayBuffer();
-      const buffer = new Uint8Array(arrayBuffer);
-
-      // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, buffer, {
-          contentType: imageFile.type,
-          upsert: false,
-        });
-
-      if (error) {
-        console.error('Error uploading image:', error);
-        throw error;
-      }
-
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      imagePath = publicUrlData.publicUrl;
-    } else if (keepExistingImage) {
-      // Keep existing image - don't update image field
-      imagePath = undefined;
-    }
+    const keepExistingImages = formData.get('keepExistingImages') as string;
 
     const updates: Partial<ProductInput> = {
       name,
@@ -121,9 +84,49 @@ export async function updateProductAction(id: string, formData: FormData) {
       category,
     };
 
-    // Only update image if new one was uploaded
-    if (imagePath !== undefined) {
-      updates.image = imagePath;
+    // Handle multiple image uploads (up to 3)
+    // Only update images if at least one new image was uploaded
+    let hasNewImages = false;
+    const imagePaths: string[] = [];
+
+    for (let i = 0; i < 3; i++) {
+      const imageFile = formData.get(`image${i}`) as File | null;
+
+      if (imageFile && imageFile.size > 0) {
+        hasNewImages = true;
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${Date.now()}_${i}.${fileExt}`;
+        const filePath = `products/${fileName}`;
+
+        // Convert File to ArrayBuffer
+        const arrayBuffer = await imageFile.arrayBuffer();
+        const buffer = new Uint8Array(arrayBuffer);
+
+        // Upload to Supabase Storage
+        const { data, error } = await supabase.storage
+          .from('product-images')
+          .upload(filePath, buffer, {
+            contentType: imageFile.type,
+            upsert: false,
+          });
+
+        if (error) {
+          console.error('Error uploading image:', error);
+          throw error;
+        }
+
+        // Get public URL
+        const { data: publicUrlData } = supabase.storage
+          .from('product-images')
+          .getPublicUrl(filePath);
+
+        imagePaths.push(publicUrlData.publicUrl);
+      }
+    }
+
+    // Only update images if new ones were uploaded
+    if (hasNewImages) {
+      updates.images = imagePaths;
     }
 
     await updateProduct(id, updates);
