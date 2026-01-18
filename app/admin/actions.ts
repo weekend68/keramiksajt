@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createProduct, updateProduct, deleteProduct } from '@/lib/products';
 import { ProductInput } from '@/lib/types';
-import { put } from '@vercel/blob';
+import { supabase } from '@/lib/supabase';
 
 export async function createProductAction(formData: FormData) {
   try {
@@ -16,13 +16,35 @@ export async function createProductAction(formData: FormData) {
 
     let imagePath = '';
 
-    // Handle image upload
+    // Handle image upload to Supabase Storage
     if (imageFile && imageFile.size > 0) {
-      const blob = await put(imageFile.name, imageFile, {
-        access: 'public',
-      });
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `products/${fileName}`;
 
-      imagePath = blob.url;
+      // Convert File to ArrayBuffer
+      const arrayBuffer = await imageFile.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, buffer, {
+          contentType: imageFile.type,
+          upsert: false,
+        });
+
+      if (error) {
+        console.error('Error uploading image:', error);
+        throw error;
+      }
+
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+
+      imagePath = publicUrlData.publicUrl;
     }
 
     const productInput: ProductInput = {
@@ -55,13 +77,35 @@ export async function updateProductAction(id: string, formData: FormData) {
 
     let imagePath: string | undefined = undefined;
 
-    // Handle image upload
+    // Handle image upload to Supabase Storage
     if (imageFile && imageFile.size > 0) {
-      const blob = await put(imageFile.name, imageFile, {
-        access: 'public',
-      });
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `products/${fileName}`;
 
-      imagePath = blob.url;
+      // Convert File to ArrayBuffer
+      const arrayBuffer = await imageFile.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, buffer, {
+          contentType: imageFile.type,
+          upsert: false,
+        });
+
+      if (error) {
+        console.error('Error uploading image:', error);
+        throw error;
+      }
+
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+
+      imagePath = publicUrlData.publicUrl;
     } else if (keepExistingImage) {
       // Keep existing image - don't update image field
       imagePath = undefined;

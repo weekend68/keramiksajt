@@ -1,9 +1,5 @@
-import { kv } from './kv';
+import { supabase } from './supabase';
 import { Product, ProductInput } from './types';
-
-// Keys structure:
-// - product:{id} -> Product object
-// - products:ids -> Set of all product IDs
 
 // Generate unique reference code (format: KER-XXXX)
 function generateReferenceCode(): string {
@@ -18,14 +14,28 @@ function generateReferenceCode(): string {
 // Read all products
 export async function getProducts(): Promise<Product[]> {
   try {
-    const ids = await kv.smembers('products:ids') as string[] || [];
-    if (ids.length === 0) return [];
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    const products = await Promise.all(
-      ids.map(id => kv.get<Product>(`product:${id}`))
-    );
+    if (error) {
+      console.error('Error fetching products:', error);
+      return [];
+    }
 
-    return products.filter(Boolean) as Product[];
+    // Map database fields to Product type (snake_case to camelCase)
+    return (data || []).map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      price: parseFloat(item.price),
+      image: item.image,
+      category: item.category,
+      status: item.status as 'available' | 'sold',
+      createdAt: item.created_at,
+      referenceCode: item.reference_code,
+    }));
   } catch (error) {
     console.error('Error fetching products:', error);
     return [];
@@ -35,8 +45,29 @@ export async function getProducts(): Promise<Product[]> {
 // Get single product by ID
 export async function getProductById(id: string): Promise<Product | null> {
   try {
-    const product = await kv.get<Product>(`product:${id}`);
-    return product || null;
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) {
+      console.error('Error fetching product:', error);
+      return null;
+    }
+
+    // Map database fields to Product type (snake_case to camelCase)
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      price: parseFloat(data.price),
+      image: data.image,
+      category: data.category,
+      status: data.status as 'available' | 'sold',
+      createdAt: data.created_at,
+      referenceCode: data.reference_code,
+    };
   } catch (error) {
     console.error('Error fetching product:', error);
     return null;
@@ -45,62 +76,160 @@ export async function getProductById(id: string): Promise<Product | null> {
 
 // Get available products (not sold)
 export async function getAvailableProducts(): Promise<Product[]> {
-  const products = await getProducts();
-  return products.filter(p => p.status === 'available');
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('status', 'available')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching available products:', error);
+      return [];
+    }
+
+    // Map database fields to Product type (snake_case to camelCase)
+    return (data || []).map(item => ({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      price: parseFloat(item.price),
+      image: item.image,
+      category: item.category,
+      status: item.status as 'available' | 'sold',
+      createdAt: item.created_at,
+      referenceCode: item.reference_code,
+    }));
+  } catch (error) {
+    console.error('Error fetching available products:', error);
+    return [];
+  }
 }
 
 // Create new product
 export async function createProduct(input: ProductInput): Promise<Product> {
   const id = Date.now().toString();
-  const product: Product = {
+  const now = new Date().toISOString();
+
+  const productData = {
     id,
-    ...input,
+    name: input.name,
+    description: input.description,
+    price: input.price,
+    image: input.image,
+    category: input.category,
     status: 'available',
-    createdAt: new Date().toISOString(),
-    referenceCode: generateReferenceCode(),
+    created_at: now,
+    reference_code: generateReferenceCode(),
   };
 
-  await kv.set(`product:${id}`, product);
-  await kv.sadd('products:ids', id);
+  const { data, error } = await supabase
+    .from('products')
+    .insert(productData)
+    .select()
+    .single();
 
-  return product;
+  if (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
+
+  // Map database fields to Product type (snake_case to camelCase)
+  return {
+    id: data.id,
+    name: data.name,
+    description: data.description,
+    price: parseFloat(data.price),
+    image: data.image,
+    category: data.category,
+    status: data.status as 'available' | 'sold',
+    createdAt: data.created_at,
+    referenceCode: data.reference_code,
+  };
 }
 
 // Update product
 export async function updateProduct(id: string, updates: Partial<ProductInput>): Promise<Product | null> {
-  const product = await getProductById(id);
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
 
-  if (!product) return null;
+    if (error || !data) {
+      console.error('Error updating product:', error);
+      return null;
+    }
 
-  const updatedProduct: Product = {
-    ...product,
-    ...updates,
-  };
-
-  await kv.set(`product:${id}`, updatedProduct);
-  return updatedProduct;
+    // Map database fields to Product type (snake_case to camelCase)
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      price: parseFloat(data.price),
+      image: data.image,
+      category: data.category,
+      status: data.status as 'available' | 'sold',
+      createdAt: data.created_at,
+      referenceCode: data.reference_code,
+    };
+  } catch (error) {
+    console.error('Error updating product:', error);
+    return null;
+  }
 }
 
 // Delete product
 export async function deleteProduct(id: string): Promise<boolean> {
-  const product = await getProductById(id);
+  try {
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id);
 
-  if (!product) return false;
+    if (error) {
+      console.error('Error deleting product:', error);
+      return false;
+    }
 
-  await kv.del(`product:${id}`);
-  await kv.srem('products:ids', id);
-
-  return true;
+    return true;
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    return false;
+  }
 }
 
 // Mark product as sold
 export async function markAsSold(id: string): Promise<Product | null> {
-  const product = await getProductById(id);
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .update({ status: 'sold' })
+      .eq('id', id)
+      .select()
+      .single();
 
-  if (!product) return null;
+    if (error || !data) {
+      console.error('Error marking product as sold:', error);
+      return null;
+    }
 
-  product.status = 'sold';
-  await kv.set(`product:${id}`, product);
-
-  return product;
+    // Map database fields to Product type (snake_case to camelCase)
+    return {
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      price: parseFloat(data.price),
+      image: data.image,
+      category: data.category,
+      status: data.status as 'available' | 'sold',
+      createdAt: data.created_at,
+      referenceCode: data.reference_code,
+    };
+  } catch (error) {
+    console.error('Error marking product as sold:', error);
+    return null;
+  }
 }

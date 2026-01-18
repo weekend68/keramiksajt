@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/fltman/agent-factory#readme",
   "dependencies": {
+    "@supabase/supabase-js": "^2.90.1",
     "@upstash/redis": "^1.36.1",
     "@vercel/blob": "^2.0.0",
     "@vercel/kv": "^3.0.0",
