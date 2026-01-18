@@ -16,8 +16,7 @@ export default async function HomePage() {
             Keramik från hjärtat
           </h1>
           <p className="text-stone-700 text-lg max-w-2xl mx-auto leading-relaxed mb-3">
-            Handgjorda keramikverk från min ateljé i Hantverksföreningen Knut, Bagarmossen.
-            Varje pjäs är unik, drejad och glaserad med omsorg.
+            Handgjorda keramikverk från min ateljé. Varje pjäs är unik, drejad och glaserad med omsorg.
           </p>
           <p className="text-stone-600 text-sm italic max-w-xl mx-auto">
             The future is handmade
@@ -100,15 +99,12 @@ export default async function HomePage() {
             {/* About the workshop */}
             <div className="border-t border-amber-100 pt-6">
               <h3 className="text-center text-stone-900 font-serif font-semibold mb-3">
-                Om verkstaden
+                Om hantverket
               </h3>
               <p className="text-stone-600 text-sm text-center leading-relaxed max-w-2xl mx-auto">
-                Jag arbetar i Hantverksföreningen Knut i Bagarmossen – en levande ateljé med keramik och textilt hantverk
-                som funnits i över 30 år. Här har jag tillgång till drejskivor, ugnar och allt som behövs för att skapa
-                unika keramikverk. Varje pjäs är formad för hand och bränd i 1240°C.
-              </p>
-              <p className="text-stone-500 text-xs text-center mt-3 italic">
-                Hantverksföreningen Knut • Bergsrådsvägen 88, Bagarmossen
+                Jag arbetar i min ateljé där jag har tillgång till drejskivor, ugnar och allt som behövs för att skapa
+                unika keramikverk. Varje pjäs är formad för hand i stengods och bränd i 1240°C.
+                Små variationer i form, färg och glasyr är en del av hantverkets charm och gör varje produkt helt unik.
               </p>
             </div>
           </div>

@@ -45,10 +45,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
               Om hantverket
             </h2>
             <p className="text-stone-600 leading-relaxed mb-4">
-              Denna pjäs är skapad i min ateljé på Hantverksföreningen Knut i Bagarmossen.
-              Där har jag tillgång till drejskivor, ugnar och ett kreativt sammanhang med andra hantverkare
-              som arbetar med keramik och textil. Föreningen har funnits i över 30 år och är en levande
-              mötesplats för hantverk.
+              Denna pjäs är skapad i min ateljé där jag har tillgång till drejskivor, ugnar och
+              allt som behövs för att skapa unika keramikverk. Jag arbetar i ett kreativt sammanhang
+              tillsammans med andra hantverkare, vilket ger inspiration och kunskap.
             </p>
             <p className="text-stone-600 leading-relaxed">
               Varje pjäs är formad för hand i stengods och bränd i 1240°C, vilket ger styrka och hållbarhet
@@ -77,7 +76,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-amber-600 font-bold flex-shrink-0">✓</span>
-                <span><strong>Gemenskap</strong> - Del av en 30-årig hantverkstradition i Bagarmossen</span>
+                <span><strong>Gemenskap</strong> - Del av en levande hantverkstradition</span>
               </li>
             </ul>
           </div>
