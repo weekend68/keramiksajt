@@ -119,30 +119,36 @@ export default function EditProductModal({ product, onClose }: EditProductModalP
                 className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-stone-500 focus:border-transparent"
               >
                 <option value="">Välj kategori</option>
-                <option value="tallrik">Tallrik</option>
-                <option value="skål">Skål</option>
-                <option value="fat">Fat</option>
-                <option value="lampfot">Lampfot</option>
-                <option value="annat">Annat</option>
+                <option value="Skål">Skål</option>
+                <option value="Vas">Vas</option>
+                <option value="Kopp">Kopp</option>
+                <option value="Övrigt">Övrigt</option>
               </select>
             </div>
 
-            {/* Current Image */}
-            {product.image && !imagePreview && (
+            {/* Current Images */}
+            {product.images && product.images.length > 0 && !imagePreview && (
               <div>
                 <label className="block text-sm font-medium text-stone-700 mb-1">
-                  Nuvarande bild
+                  Nuvarande bilder ({product.images.length})
                 </label>
-                <div className="relative w-full h-48">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover rounded-lg"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
+                <div className="grid grid-cols-3 gap-2">
+                  {product.images.map((img, idx) => (
+                    <div key={idx} className="relative w-full h-32">
+                      <Image
+                        src={img}
+                        alt={`${product.name} bild ${idx + 1}`}
+                        fill
+                        className="object-cover rounded-lg"
+                        sizes="150px"
+                      />
+                    </div>
+                  ))}
                 </div>
-                <input type="hidden" name="keepExistingImage" value={product.image} />
+                <input type="hidden" name="keepExistingImages" value="true" />
+                <p className="text-xs text-stone-500 mt-1">
+                  Ladda upp nya bilder nedan för att ersätta dessa
+                </p>
               </div>
             )}
 
