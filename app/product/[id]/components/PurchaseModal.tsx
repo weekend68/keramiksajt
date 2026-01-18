@@ -129,6 +129,7 @@ export default function PurchaseModal({
                   <li>Produkten reserveras i 24 timmar</li>
                   <li>Du får Swish-info för att slutföra köpet</li>
                   <li>Betalning: {productPrice} kr via Swish</li>
+                  <li className="text-green-700 font-medium">Fri frakt ingår i priset</li>
                 </ul>
               </div>
 

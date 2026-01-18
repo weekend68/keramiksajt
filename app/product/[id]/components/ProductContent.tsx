@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Product } from '@/lib/types';
 import CopyButton from './CopyButton';
@@ -13,12 +13,22 @@ interface ProductContentProps {
 
 export default function ProductContent({ product, swishNumber }: ProductContentProps) {
   const [isReserved, setIsReserved] = useState(product.status === 'reserved');
+  const paymentBoxRef = useRef<HTMLDivElement>(null);
 
   const handleReservationSuccess = () => {
     setIsReserved(true);
     // Force a page refresh to get updated data
     window.location.reload();
   };
+
+  // Scroll to payment box when product is reserved
+  useEffect(() => {
+    if (isReserved && product.status === 'reserved' && paymentBoxRef.current) {
+      setTimeout(() => {
+        paymentBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [isReserved, product.status]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-0">
@@ -61,11 +71,14 @@ export default function ProductContent({ product, swishNumber }: ProductContentP
         </div>
 
         <div className="border-t border-amber-100 pt-6 mb-8">
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-baseline gap-2 mb-2">
             <span className="text-4xl font-bold text-stone-900">
               {product.price} kr
             </span>
           </div>
+          <p className="text-sm text-green-700 font-medium">
+            ✓ Fri frakt ingår
+          </p>
         </div>
 
         {/* Purchase/Reservation Status */}
@@ -106,7 +119,7 @@ export default function ProductContent({ product, swishNumber }: ProductContentP
         )}
 
         {isReserved && product.status === 'reserved' && (
-          <div className="bg-amber-100 border-2 border-amber-500 rounded-2xl p-6">
+          <div ref={paymentBoxRef} className="bg-amber-100 border-2 border-amber-500 rounded-2xl p-6">
             <h2 className="text-xl font-serif font-semibold text-stone-900 mb-2">
               Produkt reserverad!
             </h2>
