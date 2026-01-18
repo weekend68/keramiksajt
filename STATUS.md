@@ -147,7 +147,27 @@ Next.js → Supabase Postgres → ✅ Fungerar perfekt
 - [x] Environment variables konfigurerade
 - [x] Gamla resources borttagna
 - [x] Allt committat till git
+- [x] UX-design förbättrad
+- [x] Redirect-bug fixad
 - [ ] Första produkten skapad (testar du!)
+
+---
+
+## 🎨 UX-förbättringar (nytt!)
+
+**Implementerat:**
+- ✅ Varmare färgpalett (warm white, amber, beige)
+- ✅ Serif fonts för rubriker (Georgia)
+- ✅ Bättre hero section: "Keramik från hjärtat"
+- ✅ Förbättrade produktkort (rundare, bättre hover)
+- ✅ Produktsida 60/40 layout (bild dominant)
+- ✅ Amber Swish-box med trust indicators
+- ✅ Varmre microcopy och tomma states
+- ✅ Prefers-reduced-motion support
+
+**Före vs Efter:**
+- Före: Steril, corporate känsla
+- Efter: Varm, organisk hantverk-känsla
 
 ---
 
