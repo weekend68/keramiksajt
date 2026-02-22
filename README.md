@@ -1,94 +1,90 @@
-# Keramiksajt MVP
+# Keramiksajt
 
-En enkel portfolio + e-handel sajt för hobbykeramiker.
+En portfolio och e-handelssajt för hobbykeramik. Besökare kan bläddra bland keramikprodukter och köpa via Swish. Ägaren hanterar sortimentet via en lösenordsskyddad adminpanel.
 
 ## Funktioner
 
-### Public (Besökare)
-- **Galleri** (`/`) - Visa alla tillgängliga produkter
-- **Produktsida** (`/product/[id]`) - Visa produktdetaljer och Swish-betalningsinformation
+**För besökare**
+- Galleri med alla tillgängliga produkter, filtrering per kategori
+- Produktsidor med bilder, beskrivning och pris
+- Swish-köpflöde: unik referenskod per produkt, kopierbart Swish-nummer
+- Reservationssystem – reservera en produkt i väntan på betalning
 
-### Admin (`/admin`)
-- Lösenordsskyddad admin-panel
-- Skapa nya produkter (med bilduppladdning)
-- Redigera befintliga produkter
-- Ta bort produkter
-- Se alla produkter och deras status
+**Admin** (`/admin`)
+- Lösenordsskyddad panel
+- Skapa, redigera och ta bort produkter
+- Uppladdning av flera bilder per produkt
+- Hantera produktstatus (tillgänglig / reserverad / såld)
 
-## Teknisk Stack
+## Tech stack
 
-- **Next.js 14** (App Router)
-- **TypeScript**
-- **Tailwind CSS**
-- **JSON-fil databas** (`data/products.json`)
-- **Server Actions** för mutations
+| Del | Teknologi |
+|-----|-----------|
+| Frontend + Backend | Next.js 14 (App Router, Server Actions) |
+| Språk | TypeScript |
+| Styling | Tailwind CSS |
+| Databas | Supabase (Postgres) |
+| Bildlagring | Supabase Storage |
+| Deployment | Vercel |
 
-## Installation
+## Kom igång lokalt
+
+**Förutsättningar:** Node.js 18+, ett Supabase-konto
 
 ```bash
+# Klona repot
+git clone https://github.com/ditt-användarnamn/keramiksajt.git
+cd keramiksajt
+
 # Installera dependencies
 npm install
+```
 
-# Starta development server
+### Miljövariabler
+
+Skapa `.env.local` i projektets rot:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://ditt-projekt-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=din-anon-nyckel-här
+
+# Admin
+ADMIN_PASSWORD=välj-ett-lösenord
+
+# Swish
+SWISH_NUMBER=ditt-swish-nummer
+```
+
+### Databas-setup
+
+Se `SUPABASE_SETUP.md` för fullständiga instruktioner. Kortversion:
+
+1. Skapa ett Supabase-projekt på [supabase.com](https://supabase.com)
+2. Kör `supabase/schema.sql` i SQL Editor för att skapa tabeller
+3. Kör `supabase/storage.sql` för att skapa bildlagring
+
+### Starta
+
+```bash
 npm run dev
 ```
 
-Sajten körs på: http://localhost:3000
+Sajten körs på [http://localhost:3000](http://localhost:3000)
 
-## Konfiguration
-
-Redigera `.env.local`:
-
-```env
-# Admin-lösenord för /admin
-ADMIN_PASSWORD=keramik2024
-
-# Swish-nummer för betalningar
-SWISH_NUMBER=123 456 78 90
-```
-
-## Användning
-
-### För keramikern (Admin)
-
-1. Gå till `/admin`
-2. Logga in med lösenordet (standard: `keramik2024`)
-3. Skapa nya produkter genom att fylla i formuläret:
-   - Namn
-   - Beskrivning
-   - Pris (kr)
-   - Kategori
-   - Ladda upp bild (från mobil/desktop)
-4. Redigera eller ta bort produkter från listan
-
-### För kunder (Public)
-
-1. Besök sajten (/)
-2. Klicka på en produkt för detaljer
-3. Se Swish-information:
-   - Swish-nummer (kopierbart)
-   - Produktreferenskod (används som meddelande i Swish)
-   - Belopp
-4. Betala via Swish med referenskoden som meddelande
-5. Keramikern kontaktar kunden efter betalning
-
-## Produktreferenskoder
-
-Varje produkt får automatiskt en unik referenskod (format: `KER-XXXX`). Kunder använder denna kod som meddelande i Swish-betalningen så att keramikern kan matcha betalningar med rätt produkt.
-
-## Deployment
-
-Sajten kan deployas gratis på Vercel:
+## Deployment på Vercel
 
 ```bash
-# Installera Vercel CLI
+# Installera Vercel CLI (om du inte redan har den)
 npm i -g vercel
 
-# Deploy
+# Deploya
 vercel
 ```
 
-Kom ihåg att sätta environment variables på Vercel:
+Sätt följande miljövariabler i Vercel-dashboarden:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `ADMIN_PASSWORD`
 - `SWISH_NUMBER`
 
@@ -97,36 +93,27 @@ Kom ihåg att sätta environment variables på Vercel:
 ```
 keramiksajt/
 ├── app/
-│   ├── page.tsx                    # Public gallery
-│   ├── product/[id]/page.tsx       # Product detail + buy
+│   ├── page.tsx                         # Galleri (startsida)
+│   ├── product/[id]/
+│   │   ├── page.tsx                     # Produktsida
+│   │   └── components/                  # PurchaseModal, CopyButton m.m.
 │   ├── admin/
-│   │   ├── layout.tsx              # Admin auth wrapper
-│   │   ├── page.tsx                # Admin panel
-│   │   ├── actions.ts              # Server Actions
-│   │   └── components/             # Admin UI components
-│   └── api/admin/auth/route.ts     # Auth API
+│   │   ├── page.tsx                     # Adminpanel
+│   │   ├── layout.tsx                   # Auth-wrapper
+│   │   ├── actions.ts                   # Server Actions (CRUD, bilduppladdning)
+│   │   └── components/                  # ProductForm, EditProductModal, ProductList
+│   └── api/admin/auth/route.ts          # Autentisering
 ├── lib/
-│   ├── types.ts                    # TypeScript types
-│   └── products.ts                 # Data access layer
-├── data/
-│   └── products.json               # JSON database
-├── public/
-│   └── uploads/                    # Uploaded images
-└── .env.local                      # Environment variables
+│   ├── supabase.ts                      # Supabase-klient
+│   ├── products.ts                      # Dataåtkomst (produkter)
+│   └── types.ts                         # TypeScript-typer
+├── supabase/
+│   ├── schema.sql                       # Databas-schema
+│   ├── storage.sql                      # Storage-konfiguration
+│   └── add-reservations.sql             # Migration: reservationssystem
+└── SUPABASE_SETUP.md                    # Detaljerad setup-guide
 ```
 
-## Tips
+## Om projektet
 
-- Testa med mobil för att säkerställa att bilduppladdning fungerar
-- Produktreferenskoder är unika och genereras automatiskt
-- Bilder sparas i `public/uploads/` och kan raderas manuellt om nödvändigt
-- JSON-databasen finns i `data/products.json` - backa upp denna fil regelbundet
-
-## Support
-
-Detta är en MVP-version. Framtida förbättringar kan inkludera:
-- Riktig Swish-integration
-- E-postnotifieringar
-- Lagerstatus
-- Kundregister
-- Order-historik
+Projektet byggdes med [Claude Code](https://claude.ai/code) och dess agent-system (se `CLAUDE.md`). Agenter med olika specialiseringar samarbetade för att ta sajten från idé till färdig implementation – frontend, backend, databas och deployment.

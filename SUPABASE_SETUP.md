@@ -7,14 +7,16 @@ Detta projekt använder Supabase för databas (Postgres) och bildlagring (Storag
 Skapa en `.env.local`-fil i projektets rot med följande innehåll:
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=https://pdhphdlynzcytdpnixpu.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_ZpiPnSckDxtgRN8XxOX0Pg_isnJeEYF
+NEXT_PUBLIC_SUPABASE_URL=https://ditt-projekt-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=din-anon-nyckel-här
 ```
+
+Du hittar dessa värden i ditt Supabase-projekt under **Settings → API**.
 
 ## Steg 2: Skapa databas-schema
 
-1. Gå till Supabase Dashboard: https://supabase.com/dashboard/project/pdhphdlynzcytdpnixpu
-2. Navigera till **SQL Editor**
+1. Gå till [Supabase Dashboard](https://supabase.com/dashboard)
+2. Välj ditt projekt och navigera till **SQL Editor**
 3. Kopiera innehållet från `supabase/schema.sql`
 4. Klistra in i SQL Editor och kör scriptet
 
@@ -25,8 +27,8 @@ Detta skapar:
 
 ## Steg 3: Skapa Storage Bucket
 
-1. Gå till Supabase Dashboard: https://supabase.com/dashboard/project/pdhphdlynzcytdpnixpu
-2. Navigera till **SQL Editor**
+1. Gå till [Supabase Dashboard](https://supabase.com/dashboard)
+2. Välj ditt projekt och navigera till **SQL Editor**
 3. Kopiera innehållet från `supabase/storage.sql`
 4. Klistra in i SQL Editor och kör scriptet
 
@@ -55,21 +57,6 @@ npm install
 npm run dev
 ```
 
-## Vad har migrerats
-
-### Från Vercel KV till Supabase Postgres
-- `lib/kv.ts` → `lib/supabase.ts`
-- `lib/products.ts` - Uppdaterad för att använda Supabase Postgres queries
-- Data lagras nu i en relationsdatabas istället för key-value store
-
-### Från Vercel Blob till Supabase Storage
-- `app/admin/actions.ts` - Uppdaterad för att använda Supabase Storage
-- Bilder lagras i `product-images` bucket
-- Publika URLs genereras automatiskt
-
-### Konfiguration
-- `next.config.js` - Uppdaterad för att tillåta bilder från Supabase domäner
-
 ## Troubleshooting
 
 ### RLS (Row Level Security) problem
@@ -94,7 +81,7 @@ Om du får permission errors:
 För admin-operationer (create, update, delete), kan du också använda service role key:
 
 ```bash
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+SUPABASE_SERVICE_ROLE_KEY=din-service-role-nyckel-här
 ```
 
 Uppdatera sedan `lib/supabase.ts`:
